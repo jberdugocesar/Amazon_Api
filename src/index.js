@@ -19,6 +19,11 @@ mongoose.connect(MONGO_URL, () => {
   process.exit(1);
 });
 
+app.use('/users', users);
+app.use('/products', products);
+app.use('/reviews', reviews);
+app.use('/carts', carts);
+app.use('/categories', categories);
 
 app.use((_, res) => {
   res.status(404).json({ error: "Not found" });

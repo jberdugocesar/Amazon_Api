@@ -118,4 +118,4 @@ async function deleteCategory(req, res) {
 }
 
 
-module.exports = { addProductInCategory: changeProductCategory, removeProductInCategory, getCategory, createCategory, updateCategory, deleteCategory }
+module.exports = { changeProductCategory, removeProductInCategory, getCategory, createCategory, updateCategory, deleteCategory }
