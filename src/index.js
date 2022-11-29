@@ -19,6 +19,12 @@ mongoose.connect(MONGO_URL, () => {
   process.exit(1);
 });
 
+const users = require('./routes/users');
+const categories = require('./routes/categories');
+const products = require('./routes/products');
+const reviews = require('./routes/reviews');
+const carts = require('./routes/cart');
+
 app.use('/users', users);
 app.use('/products', products);
 app.use('/reviews', reviews);
