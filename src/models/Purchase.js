@@ -2,14 +2,17 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const PurchaseSchema = new Schema({
-  cart: [{
+  products: [{
     type: Schema.Types.ObjectId,
     required: [true, 'Please provide a list of products to purchase'],
-    ref: 'Cart',
+    ref: 'Product',
   }],
   purchaseDate: {
     type: Date,
     required: [true, "Please provide a date for this purchase"],
+  },
+  totalPrice: {
+    type: Number,
   }
 
 }, { timestamps: true });
