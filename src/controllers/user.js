@@ -1,6 +1,6 @@
 const passport = require('passport');
 const jwt = require('jsonwebtoken');
-
+const bcrypt = require('bcrypt');
 const Product = require('../models/Product');
 const Review = require('../models/Review');
 const User = require('../models/User');
@@ -86,6 +86,8 @@ async function getUser(req, res) {
 
   try {
     const user = await User.findById(user_id);
+    if (user == undefined) return res.status(500).json({ error: 'User not found' });
+
     res.json({ user });
   } catch (error) {
     res.status(400).json({ error: 'Invalid user_id' });
@@ -103,12 +105,16 @@ async function updateUser(req, res) {
 
   try {
     const user = await User.findById(user_id);
+    if (user == undefined) return res.status(500).json({ error: 'User not found' });
+
     const data = {
       username: username || user.username,
       email: email || user.email,
       password: password || user.password,
       birthdate: birthdate || user.birthdate
     }
+
+    data.password = bcrypt.hashSync(data.password, 10);
     const updatedUser = await User.findByIdAndUpdate(user_id, data, { new: true });
     res.json({ user: updatedUser });
   } catch (error) {
@@ -123,6 +129,8 @@ async function deleteUser(req, res) {
   try {
 
     const user = await User.findById(user_id);
+
+    if (user == undefined) return res.status(500).json({ error: 'User not found' });
 
     user.productsOnSell.map(async product => {
 
@@ -140,10 +148,10 @@ async function deleteUser(req, res) {
     //Removiendo las review en cada producto
     user.reviews.map(async review => await Product.findByIdAndUpdate(review.product, { $pull: { 'reviews': review } }));
 
-    //Removiendo las review en el doc de Reviews
+    //Removiendo las review en el doc de Review
     user.reviews.map(async review => await Review.findByIdAndDelete(review));
 
-
+    //Removiendo carrito en el doc de Cart
     await Cart.findByIdAndDelete(user.cart);
     await User.findByIdAndDelete(user_id);
 

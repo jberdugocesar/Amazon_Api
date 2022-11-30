@@ -21,9 +21,9 @@ async function addProductInCart(req, res) {
 
     if (cart.products.find(product => product == product_id) != undefined) return res.status(400).json({ error: 'User already has this product in cart' });
 
-    await User.findByIdAndUpdate(user_id, { cart: cart._id });
+    await User.findByIdAndUpdate(user_id, { cart: cart._id }, { new: true });
 
-    cart = await Cart.findByIdAndUpdate(cart._id, { $push: { 'products': product_id } });
+    cart = await Cart.findByIdAndUpdate(cart._id, { $push: { 'products': product_id } }, { new: true });
     res.json({ cart });
 
   } catch (error) {
@@ -51,8 +51,8 @@ async function removeProductInCart(req, res) {
 
     if (cart.products.find(product => product == product_id) == undefined) return res.status(400).json({ error: 'This product is not in the cart' });
 
-    await User.findByIdAndUpdate(user_id, { cart: cart._id });
-    cart = await Cart.findByIdAndUpdate(cart._id, { $pull: { 'products': product_id } });
+    await User.findByIdAndUpdate(user_id, { cart: cart._id }, { new: true });
+    cart = await Cart.findByIdAndUpdate(cart._id, { $pull: { 'products': product_id } }, { new: true });
 
     res.json({ cart });
   } catch (error) {
@@ -94,8 +94,8 @@ async function removeAllProductsInUserCart(req, res) {
 
     if (cart.products.length == 0) return res.status(400).json({ error: 'the cart is already empty' });
 
-    await User.findByIdAndUpdate(user_id, { cart: cart._id });
-    cart = await Cart.findByIdAndUpdate(cart._id, { $set: { 'products': [] } });
+    await User.findByIdAndUpdate(user_id, { cart: cart._id }, { new: true });
+    cart = await Cart.findByIdAndUpdate(cart._id, { $set: { 'products': [] } }, { new: true });
 
     res.json({ cart });
   } catch (error) {
@@ -126,9 +126,9 @@ async function PurchaseCart(req, res) {
     await Promise.all(cartProducts.map(product => totalPrice += product.price));
 
     const purchase = await Purchase.create({ products: cart.products, purchaseDate: Date.now(), totalPrice: totalPrice.toFixed(2) });
-    await Cart.findByIdAndUpdate(cart._id, { $set: { 'products': [] } });
+    await Cart.findByIdAndUpdate(cart._id, { $set: { 'products': [] } }, { new: true });
 
-    await User.findByIdAndUpdate(user_id, { $push: { 'purchases': purchase } });
+    await User.findByIdAndUpdate(user_id, { $push: { 'purchases': purchase } }, { new: true });
 
     res.json({ purchase });
 

@@ -81,6 +81,7 @@ describe("Product Post Test", () => {
     })
 
     test('/post request success', async () => {
+        console.log(user_id)
         const product = {
             name: 'otro producto no de prueba definitivo',
             price: "50.23",
@@ -120,7 +121,7 @@ describe("Product Post Test", () => {
         const { status, _body: body } = await request(app)
             .post('/products/').send(product).set('Authorization', `Bearer ${token}`);
         expect(status).toBe(500)
-        expect(body).toStrictEqual({ error: "User or category not founded" });
+        expect(body).toStrictEqual({ error: "User or category not found" });
     })
 
 })
@@ -187,7 +188,7 @@ describe("Product Put Test", () => {
 
 
         expect(status).toBe(500)
-        expect(body).toStrictEqual({ error: "Product not founded" });
+        expect(body).toStrictEqual({ error: "Product not found" });
 
     })
 })
@@ -241,7 +242,7 @@ describe("Product Delete Test", () => {
 
 
         expect(status).toBe(500)
-        expect(body).toStrictEqual({ error: "Product not founded" });
+        expect(body).toStrictEqual({ error: "Product not found" });
 
     })
 })

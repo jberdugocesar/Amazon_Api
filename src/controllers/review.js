@@ -10,7 +10,7 @@ async function getProductReviews(req, res) {
 
   try {
     const product = await Product.findById(product_id);
-    if (product == undefined) return res.status(500).json({ error: "Product not founded" });
+    if (product == undefined) return res.status(500).json({ error: "Product not found" });
 
     let reviews;
     rating == undefined ?
@@ -34,7 +34,7 @@ async function getUserReviews(req, res) {
 
     const user = await User.findById(user_id);
 
-    if (user == undefined) return res.status(500).json({ error: "User not founded" });
+    if (user == undefined) return res.status(500).json({ error: "User not found" });
 
     let reviews;
 
@@ -57,7 +57,7 @@ async function getReview(req, res) {
 
   try {
     const review = await Review.findById(review_id);
-    if (review == undefined) return res.status(500).json({ error: "Review not founded" });
+    if (review == undefined) return res.status(500).json({ error: "Review not found" });
     res.json({ review });
   } catch (error) {
     res.status(400).json({ error: 'Invalid review_id' });
@@ -75,7 +75,7 @@ async function createReview(req, res) {
 
     dataUser = await User.findById(author);
 
-    if (dataUser == undefined || dataProduct == undefined) return res.status(500).json({ error: "User or product not founded" })
+    if (dataUser == undefined || dataProduct == undefined) return res.status(500).json({ error: "User or product not found" })
 
     await User.findByIdAndUpdate(review.author, { $push: { 'reviews': review._id } })
 
@@ -96,7 +96,7 @@ async function deleteReview(req, res) {
   try {
     const review = await Review.findById(review_id);
 
-    if (review == undefined) return res.status(500).json({ error: "Review not founded" });
+    if (review == undefined) return res.status(500).json({ error: "Review not found" });
 
     await User.findByIdAndUpdate(review.author, { $pull: { 'reviews': review_id } })
 

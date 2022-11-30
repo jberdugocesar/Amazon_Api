@@ -13,7 +13,7 @@ async function changeProductCategory(req, res) {
 
         const category = await Category.findByIdAndUpdate(category_id, { $push: { 'products': product_id } })
 
-        if (category == undefined) return res.status(500).json({ error: "Category Not founded" });
+        if (category == undefined) return res.status(500).json({ error: "Category not found" });
 
         await Product.findByIdAndUpdate(product_id, { category: category_id });
 
@@ -36,7 +36,7 @@ async function removeProductInCategory(req, res) {
     try {
         const category = await Category.findByIdAndUpdate(category_id, { $pull: { 'products': product_id } })
 
-        if (category == undefined) return res.status(500).json({ error: "Category Not founded" });
+        if (category == undefined) return res.status(500).json({ error: "Category not found" });
 
         //Provisional empty category
         Product.findByIdAndUpdate(product_id, { category: "000000000000000000000000" });
@@ -55,7 +55,7 @@ async function getCategory(req, res) {
 
     try {
         const category = await Category.findById(category_id);
-        if (category == undefined) return res.status(500).json({ error: 'Category not founded' });
+        if (category == undefined) return res.status(500).json({ error: 'Category not found' });
 
         res.json({ category });
     } catch (error) {
@@ -89,7 +89,7 @@ async function updateCategory(req, res) {
 
     try {
         const category = await Category.findById(category_id);
-        if (category == undefined) return res.status(500).json({ error: 'Category not founded' });
+        if (category == undefined) return res.status(500).json({ error: 'Category not found' });
 
         const data = {
             name: name || category.name,
@@ -108,7 +108,7 @@ async function deleteCategory(req, res) {
 
     try {
         const category = await Category.findById(category_id);
-        if (category == undefined) return res.status(500).json({ error: 'Category not founded' });
+        if (category == undefined) return res.status(500).json({ error: 'Category not found' });
 
         await Promise.all(category.products.map(async product => await Product.findByIdAndUpdate({ "_id": product }, { category: "000000000000000000000000" })));
 

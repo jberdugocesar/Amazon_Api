@@ -14,7 +14,7 @@ async function getAllProducts(req, res) {
 
     const dataCategory = await Category.findById(category);
 
-    if (dataCategory == undefined) return res.status(500).json({ error: 'Category not founded' });
+    if (dataCategory == undefined) return res.status(500).json({ error: 'Category not found' });
 
     if (category != undefined && name == undefined) products = await Promise.all(dataCategory.products.map(async product => await Product.findById(product)));
 
@@ -35,7 +35,7 @@ async function getProduct(req, res) {
 
   try {
     const product = await Product.findById(product_id);
-    if (product == undefined) return res.status(500).json({ error: 'Product not founded' });
+    if (product == undefined) return res.status(500).json({ error: 'Product not found' });
 
     res.json({ product });
   } catch (error) {
@@ -55,7 +55,7 @@ async function createProduct(req, res) {
     const dataUser = await User.findById(seller);
     const dataCategory = await Category.findById(category);
 
-    if (dataUser == undefined || dataCategory == undefined) return res.status(500).json({ error: "User or category not founded" })
+    if (dataUser == undefined || dataCategory == undefined) return res.status(500).json({ error: "User or category not found" })
 
     const product = await Product.create({ name, price, seller, status, category });
 
@@ -77,7 +77,7 @@ async function updateProduct(req, res) {
   try {
     const product = await Product.findById(product_id);
 
-    if (product == undefined) return res.status(500).json({ error: 'Product not founded' });
+    if (product == undefined) return res.status(500).json({ error: 'Product not found' });
 
     const data = {
       name: name || product.name,
@@ -91,7 +91,7 @@ async function updateProduct(req, res) {
     const dataUser = await User.findById(data.seller);
     const dataCategory = await Category.findById(data.category);
 
-    if (dataUser == undefined || dataCategory == undefined) return res.status(500).json({ error: "User or category not founded" })
+    if (dataUser == undefined || dataCategory == undefined) return res.status(500).json({ error: "User or category not found" })
 
     const newProduct = await Product.findByIdAndUpdate(product_id, data, { new: true });
     res.json({ product: newProduct });
@@ -107,7 +107,7 @@ async function deleteProduct(req, res) {
   try {
     const product = await Product.findById(product_id);
 
-    if (product == undefined) return res.status(500).json({ error: 'Product not founded' });
+    if (product == undefined) return res.status(500).json({ error: 'Product not found' });
 
     const user = await User.findById(product.seller);
     user.productsOnSell = user.productsOnSell.filter(product => product != product_id);
@@ -133,7 +133,7 @@ async function getUserProducts(req, res) {
 
   try {
     const user = await User.findById(user_id);
-    if (user == undefined) return res.status(500).json({ error: 'User not founded' });
+    if (user == undefined) return res.status(500).json({ error: 'User not found' });
 
     res.json({ products: user.productsOnSell });
   } catch (error) {

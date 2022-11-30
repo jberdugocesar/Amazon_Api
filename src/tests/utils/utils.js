@@ -15,14 +15,13 @@ async function ForTestOnly() {
         password: "123456"
     };
 
-
     ({ status, _body: body } = await request(app)
         .post('/users/register').send(user));
 
 
-    user_id = body.user;
-    console.log(`es real ${user_id}`);
-    const response = await request(app).post(`/users/login/${user_id._id}`);
+    const user_obj = body.user;
+    user_id = user_obj._id;
+    const response = await request(app).post(`/users/login/${user_id}`);
     token = response.body.token;
 
     const category = {
@@ -47,7 +46,7 @@ async function ForTestOnly() {
 
     product_id = body.product._id;
 
-    return { user_id, category_id, product_id, review_id, cart_id, token };
+    return { user_obj, user_id, category_id, product_id, review_id, cart_id, token };
 
 }
 

@@ -48,6 +48,7 @@ describe("Category Get Test", () => {
             .get(`/categories/000000000000000000000000`);
 
         expect(status).toBe(500)
+        expect(body).toStrictEqual({ error: "Category not found" });
     })
 })
 
@@ -166,7 +167,7 @@ describe("Product Put Test", () => {
 
 
         expect(status).toBe(500)
-        expect(body).toStrictEqual({ error: "Category not founded" });
+        expect(body).toStrictEqual({ error: "Category not found" });
 
     })
 })
@@ -220,7 +221,7 @@ describe("Product Delete Test", () => {
 
 
         expect(status).toBe(500)
-        expect(body).toStrictEqual({ error: "Category not founded" });
+        expect(body).toStrictEqual({ error: "Category not found" });
 
     })
 })
