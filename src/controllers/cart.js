@@ -130,6 +130,8 @@ async function PurchaseCart(req, res) {
     const purchase = await Purchase.create({ products: cart.products, purchaseDate: Date.now(), totalPrice: totalPrice.toFixed(2) });
     await Cart.findByIdAndUpdate(cart._id, { $set: { 'products': [] } });
 
+    await User.findByIdAndUpdate(user_id, { $push: { 'purchases': purchase } });
+
     res.json({ purchase });
 
   } catch (error) {
@@ -138,6 +140,20 @@ async function PurchaseCart(req, res) {
   }
 }
 
+async function getUserPurchaseHistory(req, res) {
 
+  const { user_id } = req.params;
+  if (!user_id) return res.status(400).json({ error: 'Missing user_id' });
 
-module.exports = { addProductInCart, removeProductInCart, getUserCart, removeAllProductsInUserCart, PurchaseCart }
+  try {
+    const user = await User.findById(user_id);
+
+    return res.json({ purchases: user.purchases });
+  } catch {
+    console.log(error);
+    res.status(400).json({ error: 'Invalid user_id' });
+  }
+
+}
+
+module.exports = { addProductInCart, removeProductInCart, getUserCart, removeAllProductsInUserCart, PurchaseCart, getUserPurchaseHistory }

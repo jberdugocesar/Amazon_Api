@@ -1,9 +1,10 @@
 const router = require('express').Router();
 const {
-  addProductInCart, removeProductInCart, getUserCart, removeAllProductsInUserCart: removeAllProductsInCart, PurchaseCart
+  addProductInCart, removeProductInCart, getUserCart, removeAllProductsInUserCart: removeAllProductsInCart, PurchaseCart, getUserPurchaseHistory
 } = require('../controllers/cart');
 
 router.get('/:user_id', getUserCart);
+router.get('/purchase/:user_id', PurchaseCart);
 router.post('/:user_id', addProductInCart);
 router.delete('/:user_id', removeProductInCart);
 router.delete('/all/:user_id', removeAllProductsInCart);
