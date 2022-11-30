@@ -1,27 +1,24 @@
 import app from '../index';
 import request from 'supertest';
 import mongoose from "mongoose";
-import User from "../models/User";
 
 describe("User Route Test", () => {
 
     let user_id;
-    let userslength = 0
-    beforeAll(async () => {
+    beforeEach(async () => {
 
-        mongoose.connect(global.__MONGO_URI__);
-        userslength = await User.countDocuments();
+        await mongoose.connect(global.__MONGO_URI__);
     })
 
-    afterAll(() => {
-        mongoose.connection.close()
+    afterEach(async () => {
+        await mongoose.connection.close()
     })
 
     test('/get', async () => {
         const { status, _body: body } = await request(app).get('/users/')
 
         expect(status).toBe(200)
-        expect(body.users).toHaveLength(userslength)
+        expect(body.users).toHaveLength(0)
     });
 
     test('/post', async () => {
@@ -53,6 +50,6 @@ describe("User Route Test", () => {
         const { status, _body: body } = await request(app).get('/users/')
 
         expect(status).toBe(200)
-        expect(body.users).toHaveLength(userslength + 1)
+        expect(body.users).toHaveLength(1)
     });
 })

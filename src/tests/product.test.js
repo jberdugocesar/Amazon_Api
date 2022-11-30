@@ -1,60 +1,43 @@
 import app from '../index';
 import request from 'supertest';
 import mongoose from "mongoose";
-import Product from "../models/Product"
 
 describe("Product Route Test", () => {
 
     let product_id;
-    let product_user;
-    let product_length;
 
-    beforeAll(async () => {
+    beforeEach(async () => {
 
-        mongoose.connect(global.__MONGO_URI__);
-        product_length = await Product.countDocuments();
+        await mongoose.connect(global.__MONGO_URI__);
+
     })
 
-    afterAll(() => {
-        mongoose.connection.close()
+    afterEach(async () => {
+        await mongoose.connection.close()
     })
 
     test('/get', async () => {
         const { status, _body: body } = await request(app).get('/products/')
 
         expect(status).toBe(200)
-        expect(body.products).toHaveLength(product_length)
+        expect(body.products).toHaveLength(0)
     });
 
-    test('/post user', async () => {
-        const user = {
-            username: 'pruebaproducto',
-            birthdate: "2022-04-23T18:25:43.511Z",
-            email: "pruebaproducto@hotmail.com",
-            password: "123456"
-        }
-        const { status, _body: body } = await request(app)
-            .post('/users/').send(user)
-
-        expect(status).toBe(200)
-        expect(body.user.username).toBe('pruebaproducto')
-        product_user = body;
-    })
 
     test('/post', async () => {
         const product = {
-            name: 'producto test',
+            name: 'producto final',
             price: "50.23",
             amount: "23",
-            password: "123456",
-            seller: product_user,
+            category: "6388d8898e38ab9cd2f4d900",
+            seller: "6388d88f5c146fb51b70b860",
             status: "On sell",
         }
         const { status, _body: body } = await request(app)
             .post('/products/').send(product)
 
         expect(status).toBe(200)
-        expect(body.product.name).toBe('producto test')
+        expect(body.product.name).toBe('producto final')
         product_id = body._id;
     })
 
@@ -68,10 +51,10 @@ describe("Product Route Test", () => {
         expect(body._id).toBe(product_id)
     })
 
-    test('/', async () => {
+    test('/get after Post product', async () => {
         const { status, _body: body } = await request(app).get('/products/')
 
         expect(status).toBe(200)
-        expect(body.products).toHaveLength(product_length + 1)
+        expect(body.products).toHaveLength(1)
     });
 })

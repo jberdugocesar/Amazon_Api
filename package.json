@@ -5,7 +5,7 @@
   "scripts": {
     "start": "node src/app.js",
     "dev": "nodemon src/app.js",
-    "test": "jest --detectOpenHandles --silent --runInBand"
+    "test": "jest --silent --runInBand"
   },
   "author": "jberdugocesar",
   "dependencies": {

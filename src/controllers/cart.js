@@ -17,9 +17,9 @@ async function addProductInCart(req, res) {
 
     cart = await Cart.findOne({ user: user_id });
 
-    if (cart == undefined) return res.status(500).json({ error: 'User got no cart' });
+    if (cart == undefined) return res.status(400).json({ error: 'User got no cart' });
 
-    if (cart.products.find(product => product == product_id) != undefined) return res.status(500).json({ error: 'User already has this product in cart' });
+    if (cart.products.find(product => product == product_id) != undefined) return res.status(400).json({ error: 'User already has this product in cart' });
 
     await User.findByIdAndUpdate(user_id, { cart: cart._id });
 
@@ -27,8 +27,7 @@ async function addProductInCart(req, res) {
     res.json({ cart });
 
   } catch (error) {
-    console.log(error)
-    res.status(500).json({ error: 'Invalid user_id or product_id' });
+    res.status(400).json({ error: 'Invalid user_id or product_id' });
   }
 
 }
@@ -47,18 +46,18 @@ async function removeProductInCart(req, res) {
     await Cart.findOne({ user: user_id }) ?? await Cart.create({ user: user_id });
     cart = await Cart.findOne({ user: user_id });
 
-    if (cart == undefined) return res.status(500).json({ error: 'User got no cart' });
+    if (cart == undefined) return res.status(400).json({ error: 'User got no cart' });
 
-    if (cart.products.length == 0) return res.status(500).json({ error: 'the cart is empty' });
+    if (cart.products.length == 0) return res.status(400).json({ error: 'the cart is empty' });
 
-    if (cart.products.find(product => product == product_id) == undefined) return res.status(500).json({ error: 'This product is not in the cart' });
+    if (cart.products.find(product => product == product_id) == undefined) return res.status(400).json({ error: 'This product is not in the cart' });
 
     await User.findByIdAndUpdate(user_id, { cart: cart._id });
     cart = await Cart.findByIdAndUpdate(cart._id, { $pull: { 'products': product_id } });
 
     res.json({ cart });
   } catch (error) {
-    res.status(500).json({ error: 'Invalid user_id or product_id' });
+    res.status(400).json({ error: 'Invalid user_id or product_id' });
   }
 
 }
@@ -70,11 +69,11 @@ async function getUserCart(req, res) {
   try {
     let cart = await Cart.findOne({ user: user_id });
 
-    if (cart == undefined) return res.status(500).json({ error: 'User got no cart' });
+    if (cart == undefined) return res.status(400).json({ error: 'User got no cart' });
 
     res.json({ cart });
   } catch (error) {
-    res.status(500).json({ error: 'Invalid user_id' });
+    res.status(400).json({ error: 'Invalid user_id' });
   }
 
 }
@@ -92,17 +91,17 @@ async function removeAllProductsInUserCart(req, res) {
 
     cart = await Cart.findOne({ user: user_id });
 
-    if (cart == undefined) return res.status(500).json({ error: 'User got no cart' });
+    if (cart == undefined) return res.status(400).json({ error: 'User got no cart' });
 
     console.log(cart.products)
-    if (cart.products.length == 0) return res.status(500).json({ error: 'the cart is already empty' });
+    if (cart.products.length == 0) return res.status(400).json({ error: 'the cart is already empty' });
 
     await User.findByIdAndUpdate(user_id, { cart: cart._id });
     cart = await Cart.findByIdAndUpdate(cart._id, { $set: { 'products': [] } });
 
     res.json({ cart });
   } catch (error) {
-    res.status(500).json({ error: 'Invalid user_id' });
+    res.status(400).json({ error: 'Invalid user_id' });
   }
 }
 
@@ -117,10 +116,10 @@ async function PurchaseCart(req, res) {
 
     cart = await Cart.findOne({ user: user_id });
 
-    if (cart == undefined) return res.status(500).json({ error: 'User got no cart' });
+    if (cart == undefined) return res.status(400).json({ error: 'User got no cart' });
     await User.findByIdAndUpdate(user_id, { cart: cart._id });
 
-    if (cart.products.length == 0) return res.status(500).json({ error: 'the cart is empty' });
+    if (cart.products.length == 0) return res.status(400).json({ error: 'the cart is empty' });
 
     let cartProducts = [];
     let totalPrice = 0;
@@ -135,7 +134,7 @@ async function PurchaseCart(req, res) {
 
   } catch (error) {
     console.log(error);
-    res.status(500).json({ error: 'Invalid user_id' });
+    res.status(400).json({ error: 'Invalid user_id' });
   }
 }
 

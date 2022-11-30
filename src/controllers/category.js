@@ -69,13 +69,13 @@ async function getCategory(req, res) {
 async function createCategory(req, res) {
     const { name, } = req.body;
     console.log(req.body);
-    if (!name) return res.status(400).json({ error: 'Missing product data' });
+    if (!name) return res.status(400).json({ error: 'Missing category data' });
 
     try {
         const category = await Category.create({ name });
         res.json({ category });
     } catch (error) {
-        res.status(500).json({ error: 'Invalid product data' });
+        res.status(500).json({ error: 'Invalid category data' });
     }
 }
 

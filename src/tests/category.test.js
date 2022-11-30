@@ -1,55 +1,48 @@
 import app from '../index';
 import request from 'supertest';
 import mongoose from "mongoose";
-import Category from "../models/Category";
 
 describe("Category Route Test", () => {
 
-    let user_id;
-    let userslength = 0
-    beforeAll(async () => {
+    let category_id;
 
-        mongoose.connect(global.__MONGO_URI__);
-        userslength = await Category.countDocuments();
+    beforeEach(async () => {
+
+        await mongoose.connect(global.__MONGO_URI__);
     })
 
-    afterAll(() => {
-        mongoose.connection.close()
+    afterEach(async () => {
+        await mongoose.connection.close()
     })
 
     test('/get', async () => {
-        const { status, _body: body } = await request(app).get('/categories/')
+        const { status, _body: body } = await request(app)
+            .get('/categories')
 
-        expect(status).toBe(200)
-        expect(body.users).toHaveLength(userslength)
+
+        expect(status).toBe(404)
+        expect(body).toStrictEqual({ "error": "Not found" });
     });
 
     test('/post', async () => {
         const category = {
-            name: "Anime"
+            name: "Random Category"
         }
         const { status, _body: body } = await request(app)
             .post('/categories/').send(category)
 
         expect(status).toBe(200)
-        expect(body.category.name).toBe('Anime')
-        user_id = body._id;
+        expect(body.category.name).toBe('Random Category')
+        category_id = body.category._id;
     })
 
-    test('/get', async () => {
+    test('/get category after post', async () => {
         const { status, _body: body } = await request(app)
-            .get('/categories/')
-            .send({ _id: user_id })
+            .get(`/categories/${category_id}`)
 
 
         expect(status).toBe(200)
-        expect(body._id).toBe(user_id)
+        expect(body.category._id).toBe(category_id)
     })
 
-    test('/', async () => {
-        const { status, _body: body } = await request(app).get('/categories/')
-
-        expect(status).toBe(200)
-        expect(body.users).toHaveLength(userslength + 1)
-    });
 })
