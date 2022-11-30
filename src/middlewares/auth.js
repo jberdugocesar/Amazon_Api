@@ -3,8 +3,7 @@ const jwt = require('jsonwebtoken');
 
 const protect = async (req, res, next) => {
   let token;
-  console.log(req.headers);
-  console.log(req.body);
+
   if (
     req.headers.authorization &&
     req.headers.authorization.startsWith('Bearer')
@@ -15,7 +14,6 @@ const protect = async (req, res, next) => {
       req.user = await User.findById(decoded._id).select('-password');
       next();
     } catch (err) {
-      console.log(err)
       res.status(401).json({
         message: 'Not Authorized, Token Failed',
         success: false,

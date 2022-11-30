@@ -39,7 +39,6 @@ async function removeProductInCart(req, res) {
   if (!user_id) return res.status(400).json({ error: 'Missing user_id' });
   if (!product_id) return res.status(400).json({ error: 'Missing query: product_id' });
 
-  console.log(req.query);
   try {
 
     let cart = undefined;
@@ -93,7 +92,6 @@ async function removeAllProductsInUserCart(req, res) {
 
     if (cart == undefined) return res.status(400).json({ error: 'User got no cart' });
 
-    console.log(cart.products)
     if (cart.products.length == 0) return res.status(400).json({ error: 'the cart is already empty' });
 
     await User.findByIdAndUpdate(user_id, { cart: cart._id });
@@ -135,7 +133,6 @@ async function PurchaseCart(req, res) {
     res.json({ purchase });
 
   } catch (error) {
-    console.log(error);
     res.status(400).json({ error: 'Invalid user_id' });
   }
 }
@@ -150,7 +147,6 @@ async function getUserPurchaseHistory(req, res) {
 
     return res.json({ purchases: user.purchases });
   } catch {
-    console.log(error);
     res.status(400).json({ error: 'Invalid user_id' });
   }
 

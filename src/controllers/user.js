@@ -20,7 +20,7 @@ const registerUser = async (req, res) => {
 
   await User.create(req.body, (err, user) => {
     if (err) {
-      res.status(500).json({ message: err.message, success: false });
+      res.status(400).json({ message: err.message, success: false });
     } else {
       res.status(200).json({
         user: user,
@@ -34,10 +34,9 @@ const registerUser = async (req, res) => {
 const loginUser = (req, res, next) => {
   passport.authenticate('local', { session: false }, (err, user, info) => {
     if (err | !user) {
-      res.status(500).json({ message: info.message, success: false });
+      res.status(400).json({ message: info.message, success: false });
     } else {
       const { password, ..._user } = user.toObject();
-      console.log(_user)
       const token = jwt.sign(_user, process.env.JWT_SECRET_KEY);
       res.status(200).json({
         message: 'Login Successful',
@@ -65,14 +64,8 @@ const loginUserWithID = async (req, res, next) => {
     });
 
   } catch (error) {
-    console.log(error);
-    res.status(500).json({ message: "Invalid user_id", success: false });
+    res.status(400).json({ message: "Invalid user_id", success: false });
   }
-
-
-
-
-
   (req, res, next);
 };
 
@@ -83,7 +76,7 @@ async function getAllUsers(_, res) {
     const users = await User.find();
     res.json({ users });
   } catch (error) {
-    res.status(500).json({ error: 'Error getting users' });
+    res.status(400).json({ error: 'Error getting users' });
   }
 }
 
@@ -95,7 +88,7 @@ async function getUser(req, res) {
     const user = await User.findById(user_id);
     res.json({ user });
   } catch (error) {
-    res.status(500).json({ error: 'Invalid user_id' });
+    res.status(400).json({ error: 'Invalid user_id' });
   }
 }
 
@@ -119,7 +112,7 @@ async function updateUser(req, res) {
     const updatedUser = await User.findByIdAndUpdate(user_id, data, { new: true });
     res.json({ user: updatedUser });
   } catch (error) {
-    res.status(500).json({ error: 'Invalid user_id or data' });
+    res.status(400).json({ error: 'Invalid user_id or data' });
   }
 }
 
@@ -130,8 +123,6 @@ async function deleteUser(req, res) {
   try {
 
     const user = await User.findById(user_id);
-
-    console.log("------------Eliminando Usuario -----------");
 
     user.productsOnSell.map(async product => {
 
@@ -156,12 +147,9 @@ async function deleteUser(req, res) {
     await Cart.findByIdAndDelete(user.cart);
     await User.findByIdAndDelete(user_id);
 
-    user_id ? console.log(`Usuario: ${user_id}`) : console.log("nadie");
-
     res.json({ user });
   } catch (error) {
-    console.log(error)
-    res.status(500).json({ error: "Invalid user_id" });
+    res.status(400).json({ error: "Invalid user_id" });
   }
 }
 

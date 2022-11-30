@@ -11,6 +11,8 @@ router.get('/:user_id', getUser);
 router.post('/register/', registerUser);
 router.post('/login/', loginUser);
 router.post('/login/:user_id', loginUserWithID);
+
+//Requires Authentication
 router.put('/:user_id', protect, updateUser);
 router.delete('/:user_id', protect, deleteUser);
 

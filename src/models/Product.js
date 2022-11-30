@@ -15,10 +15,6 @@ const ProductSchema = new Schema({
     min: 1,
     max: 5
   },
-  amount: {
-    type: Number,
-    required: [true, 'Please provide an amount'],
-  },
   seller: {
     type: Schema.Types.ObjectId,
     required: [true, 'Please provide the user that will sell the product'],
