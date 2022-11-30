@@ -1,3 +1,6 @@
+const passport = require('passport');
+const jwt = require('jsonwebtoken');
+
 const Product = require('../models/Product');
 const Review = require('../models/Review');
 const User = require('../models/User');
@@ -5,12 +8,22 @@ const Cart = require('../models/Cart');
 const Category = require('../models/Category');
 
 //--Validacion de Usuario
-const registerUser = (req, res) => {
-  User.create(req.body, (err, user) => {
+const registerUser = async (req, res) => {
+  const { username, email, password, birthdate } = req.body;
+  if (!username || !email || !password || !birthdate) return res.status(400).json({ error: 'Missing user data' });
+
+  const byEmail = await User.findOne({ email });
+  if (byEmail) return res.status(400).json({ error: 'Email already in use' });
+
+  const byUsername = await User.findOne({ username });
+  if (byUsername) return res.status(400).json({ error: 'Username already in use' });
+
+  await User.create(req.body, (err, user) => {
     if (err) {
       res.status(500).json({ message: err.message, success: false });
     } else {
       res.status(200).json({
+        user: user,
         message: 'User Created Successfully',
         success: true,
       });
@@ -24,6 +37,7 @@ const loginUser = (req, res, next) => {
       res.status(500).json({ message: info.message, success: false });
     } else {
       const { password, ..._user } = user.toObject();
+      console.log(_user)
       const token = jwt.sign(_user, process.env.JWT_SECRET_KEY);
       res.status(200).json({
         message: 'Login Successful',
@@ -35,7 +49,32 @@ const loginUser = (req, res, next) => {
   })(req, res, next);
 };
 
+const loginUserWithID = async (req, res, next) => {
+  const { user_id } = req.params;
+  if (!user_id) return res.status(400).json({ error: 'Missing user_id' });
 
+  try {
+    const user = await User.findById(user_id);
+    const { password, ..._user } = user.toObject();
+    const token = jwt.sign(_user, process.env.JWT_SECRET_KEY);
+    res.status(200).json({
+      message: 'Login Successful',
+      success: true,
+      data: _user,
+      token,
+    });
+
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Invalid user_id", success: false });
+  }
+
+
+
+
+
+  (req, res, next);
+};
 
 
 //--CRUD de Usuario
@@ -61,25 +100,7 @@ async function getUser(req, res) {
 }
 
 
-async function createUser(req, res) {
-  const { username, email, password, birthdate } = req.body;
-  console.log(" ----------- Creating User ---------");
-  console.log(`body: ${req.body}`);
-  if (!username || !email || !password || !birthdate) return res.status(400).json({ error: 'Missing user data' });
 
-  const byEmail = await User.findOne({ email });
-  if (byEmail) return res.status(400).json({ error: 'Email already in use' });
-
-  const byUsername = await User.findOne({ username });
-  if (byUsername) return res.status(400).json({ error: 'Username already in use' });
-
-  try {
-    const user = await User.create({ username, email, password, birthdate });
-    res.json({ user });
-  } catch (error) {
-    res.status(500).json({ error: 'Invalid user data' });
-  }
-}
 
 async function updateUser(req, res) {
   const { user_id } = req.params;
@@ -144,4 +165,4 @@ async function deleteUser(req, res) {
   }
 }
 
-module.exports = { registerUser, loginUser, getAllUsers, getUser, createUser, updateUser, deleteUser };
+module.exports = { registerUser, loginUserWithID, loginUser, getAllUsers, getUser, updateUser, deleteUser };

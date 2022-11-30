@@ -9,11 +9,14 @@
   },
   "author": "jberdugocesar",
   "dependencies": {
+    "bcrypt": "^5.1.0",
     "cors": "^2.8.5",
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^6.6.7",
+    "passport": "^0.6.0",
+    "passport-local": "^1.0.0",
     "supertest": "^6.3.1"
   },
   "devDependencies": {

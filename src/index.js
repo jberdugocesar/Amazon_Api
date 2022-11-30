@@ -1,6 +1,9 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
+const User = require('./models/User');
+const passport = require('passport');
+const passportLocal = require('passport-local');
 require('dotenv').config();
 
 
@@ -18,6 +21,27 @@ mongoose.connect(MONGO_URL, () => {
   console.log(error);
   process.exit(1);
 });
+
+passport.use(
+  'local',
+  new passportLocal.Strategy(
+    { usernameField: 'email' },
+    (email, password, done) => {
+      User.findOne({ email: email }, (err, user) => {
+        if (err) {
+          return done(err, false, { message: err.message });
+        }
+        if (!user) {
+          return done(null, false, { message: 'User Not Registered' });
+        }
+        if (!User.checkPassword(password, user.password)) {
+          return done(null, false, { message: 'Incorrect Password' });
+        }
+        return done(null, user, { message: 'Login Successful' });
+      });
+    }
+  )
+);
 
 const users = require('./routes/users');
 const categories = require('./routes/categories');
