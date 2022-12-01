@@ -6,25 +6,27 @@ const Review = require("../models/Review");
 
 async function getAllProducts(req, res) {
 
-  const { category, name } = req.query;
+  const { category_id, name } = req.query;
   try {
     let products;
 
-    products = await Product.find();
 
-    const dataCategory = await Category.findById(category);
+    if (category_id != undefined && name == undefined) {
+      const dataCategory = await Category.findById(category_id);
+      products = await Promise.all(dataCategory.products.map(async product => await Product.findById(product)));
+    }
 
-    if (dataCategory == undefined) return res.status(500).json({ error: 'Category not found' });
+    if (name != undefined && category_id == undefined) products = await Promise.all(await Product.find({ "name": { $regex: name, $options: 'i' } }));
 
-    if (category != undefined && name == undefined) products = await Promise.all(dataCategory.products.map(async product => await Product.findById(product)));
+    if (category_id && name) return res.status(500).json({ error: 'only supports one query at a time' });
 
-    if (name != undefined && category == undefined) products = await Promise.all(await Product.find({ "name": { $regex: name, $options: 'i' } }));
+    if (category_id == undefined && name == undefined) products = await Product.find();
 
-    if (category && name) return res.status(500).json({ error: 'only supports one query at a time' });
+    if (products.length == 0) return res.status(500).json({ error: 'There are not products' });
 
     res.json({ products });
   } catch (error) {
-    res.status(400).json({ error: 'Error getting products' });
+    res.status(400).json({ error: 'Invalid category_id' });
   }
 
 }
@@ -160,7 +162,6 @@ async function getUserProducts(req, res) {
     products = products.filter(product => product != undefined);
 
     if (products.length == 0) return res.status(500).json({ error: 'There are not products' });
-
 
     res.json({ products });
   } catch (error) {

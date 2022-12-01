@@ -41,17 +41,22 @@ describe("Additional Tests", () => {
         expect(body.products).toHaveLength(3);
     });
 
-    test('/Get productos segun nombre de cierta categoria', async () => {
+    test('/Get productos de cierta categoria', async () => {
         const { status, _body: body } = await request(app)
-            .get(`/products/user/${new_user_id}?category_name=${new_category.name}`);
+            .get(`/products/?category_id=${new_category_id}`)
 
         expect(status).toBe(200)
         expect(body.products).toHaveLength(3);
     });
 
 
+    test('/Get productos de un usuario segun nombre de cierta categoria', async () => {
 
+        const { status, _body: body } = await request(app)
+            .get(`/products/user/${new_user_id}?category_name=${new_category.name}`);
 
-
+        expect(status).toBe(200)
+        expect(body.products).toHaveLength(3);
+    });
 
 })

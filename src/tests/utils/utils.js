@@ -1,6 +1,6 @@
 import app from '../../index';
 import request from 'supertest';
-
+const Category = require('../../models/Category');
 //Simplemente crea un objeto por cada clase para propositos de prueba
 //Puede mejorar la logica, pero  este ambiente de pruebas funciona.
 
@@ -29,19 +29,20 @@ async function ForTestOnly() {
         name: 'category prueba',
     };
 
-    const new_category = {
+    let new_category = {
         name: 'categoria bien nueva y buena',
     };
 
     ({ status, _body: body } = await request(app)
         .post('/categories/').send(new_category).set('Authorization', `Bearer ${token}`));
 
+    const new_category_id = body.category._id;
+
     ({ status, _body: body } = await request(app)
         .post('/categories/').send(category).set('Authorization', `Bearer ${token}`));
 
     category_id = body.category._id;
 
-    const new_category_id = body.category._id;
 
     const product = {
         name: 'producto final prueba',
@@ -119,6 +120,9 @@ async function ForTestOnly() {
         .post('/products/').send(newproduct).set('Authorization', `Bearer ${token}`));
 
     const new_product_id = body.product._id;
+
+    //new_category = await Category.findById(new_category_id);
+
 
 
     ({ status, _body: body } = await request(app)
