@@ -35,7 +35,7 @@ async function addProductInCart(req, res) {
 async function removeProductInCart(req, res) {
 
   const { user_id } = req.params;
-  const { product_id } = req.query;
+  const { product_id, removeAll } = req.query;
   if (!user_id) return res.status(400).json({ error: 'Missing user_id' });
   if (!product_id) return res.status(400).json({ error: 'Missing query: product_id' });
 
@@ -47,7 +47,7 @@ async function removeProductInCart(req, res) {
 
     if (cart == undefined) return res.status(400).json({ error: 'User got no cart' });
 
-    if (cart.products.length == 0) return res.status(400).json({ error: 'the cart is empty' });
+    if (cart.products.length == 0) return res.status(400).json({ error: 'the cart is already empty' });
 
     if (cart.products.find(product => product == product_id) == undefined) return res.status(400).json({ error: 'This product is not in the cart' });
 
