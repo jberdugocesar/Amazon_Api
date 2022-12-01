@@ -13,7 +13,7 @@ async function changeProductCategory(req, res) {
 
         const category = await Category.findByIdAndUpdate(category_id, { $push: { 'products': product_id } })
 
-        if (category == undefined) return res.status(400).json({ error: "Category Not founded" });
+        if (category == undefined) return res.status(500).json({ error: "Category Not founded" });
 
         await Product.findByIdAndUpdate(product_id, { category: category_id });
 
@@ -36,7 +36,7 @@ async function removeProductInCategory(req, res) {
     try {
         const category = await Category.findByIdAndUpdate(category_id, { $pull: { 'products': product_id } })
 
-        if (category == undefined) return res.status(400).json({ error: "Category Not founded" });
+        if (category == undefined) return res.status(500).json({ error: "Category Not founded" });
 
         //Provisional empty category
         Product.findByIdAndUpdate(product_id, { category: "000000000000000000000000" });
@@ -55,7 +55,7 @@ async function getCategory(req, res) {
 
     try {
         const category = await Category.findById(category_id);
-        if (category == undefined) return res.status(400).json({ error: 'category not founded' });
+        if (category == undefined) return res.status(500).json({ error: 'Category not founded' });
 
         res.json({ category });
     } catch (error) {
@@ -71,7 +71,7 @@ async function createCategory(req, res) {
     try {
 
         const byName = await Category.findOne({ name });
-        if (byName) return res.status(400).json({ error: 'this category already exists' });
+        if (byName) return res.status(500).json({ error: 'This category already exists' });
 
         const category = await Category.create({ name });
 
@@ -89,13 +89,13 @@ async function updateCategory(req, res) {
 
     try {
         const category = await Category.findById(category_id);
-        if (category == undefined) return res.status(500).json({ error: 'category not founded' });
+        if (category == undefined) return res.status(500).json({ error: 'Category not founded' });
 
         const data = {
             name: name || category.name,
         }
         const updatedCategory = await Category.findByIdAndUpdate(category_id, data, { new: true });
-        res.json({ product: updatedCategory });
+        res.json({ category: updatedCategory });
     } catch (error) {
         res.status(400).json({ error: 'Invalid category_id or data' });
     }
@@ -108,7 +108,7 @@ async function deleteCategory(req, res) {
 
     try {
         const category = await Category.findById(category_id);
-        if (category == undefined) return res.status(500).json({ error: 'category not founded' });
+        if (category == undefined) return res.status(500).json({ error: 'Category not founded' });
 
         await Promise.all(category.products.map(async product => await Product.findByIdAndUpdate({ "_id": product }, { category: "000000000000000000000000" })));
 

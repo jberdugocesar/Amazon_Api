@@ -9,7 +9,6 @@ describe("Cart Route Test", () => {
     let cart_id;
 
     beforeEach(async () => {
-
         await mongoose.connect(global.__MONGO_URI__);
     })
 

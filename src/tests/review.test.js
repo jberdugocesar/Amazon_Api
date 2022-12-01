@@ -22,7 +22,7 @@ describe("Review Route Test", () => {
         const { status, _body: body } = await request(app)
             .post('/reviews/').send(review)
 
-        expect(status).toBe(400)
+        expect(status).toBe(401)
         expect(body).toStrictEqual({ error: "Missing review data" });
     })
 
