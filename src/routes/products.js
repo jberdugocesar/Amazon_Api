@@ -7,7 +7,7 @@ const {
 
 router.get('/', getAllProducts);
 router.get('/:product_id', getProduct);
-router.get('/:user_id', getUserProducts);
+router.get('/user/:user_id', getUserProducts);
 
 //Requires Authentication
 router.post('/', protect, createProduct);

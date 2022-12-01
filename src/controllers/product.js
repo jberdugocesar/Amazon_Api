@@ -129,15 +129,43 @@ async function deleteProduct(req, res) {
 
 async function getUserProducts(req, res) {
   const { user_id } = req.params;
+
+  const { category_name, category_id } = req.query;
+
   if (!user_id) return res.status(400).json({ error: 'Missing user_id' });
 
   try {
     const user = await User.findById(user_id);
     if (user == undefined) return res.status(500).json({ error: 'User not found' });
 
-    res.json({ products: user.productsOnSell });
+    let products;
+
+    if (category_id && category_name) return res.status(500).json({ error: 'only supports one query at a time' });
+
+    if (category_id != undefined && category_name == undefined)
+      products = await Promise.all(user.productsOnSell.map(async product => await Product.findById(product).where({ category: category_id })));
+
+    if (category_name != undefined && category_id == undefined) {
+      //Lista de categorias que tengan un nombre parecido del query
+      const list_category = await Category.find({ "name": { $regex: category_name, $options: 'i' } });
+
+      products = await Promise.all(list_category.map(async dataCategory => await Promise.all(user.productsOnSell.map(async product => await Product.findById(product).where({ category: dataCategory._id })))));
+      products = products.flat();
+    }
+
+    if (category_id == undefined && category_name == undefined)
+      products = await Promise.all(user.productsOnSell.map(async product => await Product.findById(product)));
+
+
+    products = products.filter(product => product != undefined);
+
+    if (products.length == 0) return res.status(500).json({ error: 'There are not products' });
+
+
+    res.json({ products });
   } catch (error) {
-    res.status(400).json({ error: 'Invalid user_id' });
+    console.log(error);
+    res.status(500).json({ error: 'Invalid user_id' });
   }
 }
 
