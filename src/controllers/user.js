@@ -18,17 +18,20 @@ const registerUser = async (req, res) => {
   const byUsername = await User.findOne({ username });
   if (byUsername) return res.status(400).json({ error: 'Username already in use' });
 
-  await User.create(req.body, (err, user) => {
+  await User.create(req.body, async (err, user) => {
     if (err) {
       res.status(400).json({ message: err.message, success: false });
     } else {
+      const cart = await Cart.create({ user: user._id });
+      const updated = await User.findByIdAndUpdate(user._id, { cart: cart }, { new: true })
       res.status(200).json({
-        user: user,
+        user: updated,
         message: 'User Created Successfully',
         success: true,
       });
     }
   });
+
 };
 
 const loginUser = (req, res, next) => {

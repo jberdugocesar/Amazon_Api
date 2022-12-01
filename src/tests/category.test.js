@@ -114,7 +114,7 @@ describe("Category Post Test ", () => {
 
 })
 
-describe("Product Put Test", () => {
+describe("Category Put Test", () => {
 
     let category_id, token;
 
@@ -172,7 +172,7 @@ describe("Product Put Test", () => {
     })
 })
 
-describe("Product Delete Test", () => {
+describe("Category Delete Test", () => {
 
     let category_id, token;
 

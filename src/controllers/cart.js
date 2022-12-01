@@ -12,16 +12,14 @@ async function addProductInCart(req, res) {
 
   try {
 
-    let cart = undefined;
-    await Cart.findOne({ user: user_id }) ?? await Cart.create({ user: user_id });
+    let user = await User.findById(user_id);
+    let product = await Product.findById(product_id);
 
-    cart = await Cart.findOne({ user: user_id });
+    if (user == undefined) return res.status(500).json({ error: "User not found" });
+    if (product == undefined) return res.status(500).json({ error: "Product not found" });
 
-    if (cart == undefined) return res.status(400).json({ error: 'User got no cart' });
-
+    let cart = await Cart.findById(user.cart);
     if (cart.products.find(product => product == product_id) != undefined) return res.status(400).json({ error: 'User already has this product in cart' });
-
-    await User.findByIdAndUpdate(user_id, { cart: cart._id }, { new: true });
 
     cart = await Cart.findByIdAndUpdate(cart._id, { $push: { 'products': product_id } }, { new: true });
     res.json({ cart });
@@ -35,17 +33,19 @@ async function addProductInCart(req, res) {
 async function removeProductInCart(req, res) {
 
   const { user_id } = req.params;
-  const { product_id, removeAll } = req.query;
+  const { product_id } = req.query;
   if (!user_id) return res.status(400).json({ error: 'Missing user_id' });
   if (!product_id) return res.status(400).json({ error: 'Missing query: product_id' });
 
   try {
 
-    let cart = undefined;
-    await Cart.findOne({ user: user_id }) ?? await Cart.create({ user: user_id });
-    cart = await Cart.findOne({ user: user_id });
+    let user = await User.findById(user_id);
+    let product = await Product.findById(product_id);
 
-    if (cart == undefined) return res.status(400).json({ error: 'User got no cart' });
+    if (user == undefined) return res.status(500).json({ error: "User not found" });
+    if (product == undefined) return res.status(500).json({ error: "Product not found" });
+
+    let cart = await Cart.findById(user.cart);
 
     if (cart.products.length == 0) return res.status(400).json({ error: 'the cart is already empty' });
 
@@ -66,9 +66,10 @@ async function getUserCart(req, res) {
   if (!user_id) return res.status(400).json({ error: 'Missing user_id' });
 
   try {
-    let cart = await Cart.findOne({ user: user_id });
+    let user = await User.findById(user_id);
+    if (user == undefined) return res.status(500).json({ error: "User not found" });
 
-    if (cart == undefined) return res.status(400).json({ error: 'User got no cart' });
+    let cart = await Cart.findById(user.cart);
 
     res.json({ cart });
   } catch (error) {
@@ -85,16 +86,13 @@ async function removeAllProductsInUserCart(req, res) {
 
   try {
 
-    let cart = undefined;
-    await Cart.findOne({ user: user_id }) ?? await Cart.create({ user: user_id });
+    let user = await User.findById(user_id);
+    if (user == undefined) return res.status(500).json({ error: "User not found" });
 
-    cart = await Cart.findOne({ user: user_id });
-
-    if (cart == undefined) return res.status(400).json({ error: 'User got no cart' });
+    const cart = Cart.findById(user.cart);
 
     if (cart.products.length == 0) return res.status(400).json({ error: 'the cart is already empty' });
 
-    await User.findByIdAndUpdate(user_id, { cart: cart._id }, { new: true });
     cart = await Cart.findByIdAndUpdate(cart._id, { $set: { 'products': [] } }, { new: true });
 
     res.json({ cart });
@@ -108,14 +106,10 @@ async function PurchaseCart(req, res) {
   if (!user_id) return res.status(400).json({ error: 'Missing user_id' });
 
   try {
+    let user = await User.findById(user_id);
+    if (user == undefined) return res.status(500).json({ error: "User not found" });
 
-    let cart = undefined;
-    await Cart.findOne({ user: user_id }) ?? await Cart.create({ user: user_id });
-
-    cart = await Cart.findOne({ user: user_id });
-
-    if (cart == undefined) return res.status(400).json({ error: 'User got no cart' });
-    await User.findByIdAndUpdate(user_id, { cart: cart._id });
+    const cart = await Cart.findById(user.cart);
 
     if (cart.products.length == 0) return res.status(400).json({ error: 'the cart is empty' });
 
@@ -144,6 +138,7 @@ async function getUserPurchaseHistory(req, res) {
 
   try {
     const user = await User.findById(user_id);
+    if (user == undefined) return res.status(500).json({ error: 'User not found' });
 
     return res.json({ purchases: user.purchases });
   } catch {

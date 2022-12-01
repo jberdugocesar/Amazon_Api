@@ -71,12 +71,29 @@ async function ForTestOnly() {
     };
 
     ({ status, _body: body } = await request(app)
-        .post('/reviews/').send(review).set('Authorization', `Bearer ${new_token}`));
+        .post('/reviews/').send(review).set('Authorization', `Bearer ${token}`));
 
     review_id = body.review._id;
 
+    const newproduct = {
+        name: 'producto nuevo de otro usuario',
+        price: "12.34",
+        category: category_id,
+        seller: user_id,
+        status: "On sell"
+    };
 
-    return { user_obj, user_id, category_id, product_id, review_id, cart_id, token, new_user_obj, new_user_id, new_token };
+    ({ status, _body: body } = await request(app)
+        .post('/products/').send(newproduct).set('Authorization', `Bearer ${token}`));
+
+    const new_product_id = body.product._id;
+
+
+    ({ status, _body: body } = await request(app)
+        .post(`/carts/${new_user_id}?product_id=${new_product_id}`).set('Authorization', `Bearer ${new_token}`));
+
+
+    return { user_obj, user_id, category_id, product_id, review_id, cart_id, token, new_user_obj, new_user_id, new_token, new_product_id };
 
 }
 
