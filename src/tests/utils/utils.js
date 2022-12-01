@@ -1,7 +1,7 @@
 import app from '../../index';
 import request from 'supertest';
 
-//Simplemente crea un objeto por cada tipo para propositos de prueba
+//Simplemente crea un objeto por cada clase para propositos de prueba
 
 async function ForTestOnly() {
     let status, body, token;
@@ -21,7 +21,7 @@ async function ForTestOnly() {
 
     const user_obj = body.user;
     user_id = user_obj._id;
-    const response = await request(app).post(`/users/login/${user_id}`);
+    let response = await request(app).post(`/users/login/${user_id}`);
     token = response.body.token;
 
     const category = {
@@ -46,7 +46,37 @@ async function ForTestOnly() {
 
     product_id = body.product._id;
 
-    return { user_obj, user_id, category_id, product_id, review_id, cart_id, token };
+    const new_user = {
+        username: 'El reviewer',
+        birthdate: "2022-04-23T18:25:43.511Z",
+        email: "ReviewManIto@hotmail.com",
+        password: "123456"
+    };
+
+    ({ status, _body: body } = await request(app)
+        .post('/users/register/').send(new_user));
+
+    let new_user_obj = body.user;
+    let new_user_id = body.user._id;
+
+    response = await request(app).post(`/users/login/${new_user_id}`);
+    let new_token = response.body.token;
+
+
+    const review = {
+        author: new_user_id,
+        body: "Esta es mi primera review en otro producto",
+        product: product_id,
+        rating: 3
+    };
+
+    ({ status, _body: body } = await request(app)
+        .post('/reviews/').send(review).set('Authorization', `Bearer ${new_token}`));
+
+    review_id = body.review._id;
+
+
+    return { user_obj, user_id, category_id, product_id, review_id, cart_id, token, new_user_obj, new_user_id, new_token };
 
 }
 

@@ -71,9 +71,9 @@ async function createReview(req, res) {
   try {
     const review = await Review.create({ author, body, product, rating });
 
-    dataProduct = await Product.findById(product);
+    const dataProduct = await Product.findById(product);
 
-    dataUser = await User.findById(author);
+    const dataUser = await User.findById(author);
 
     if (dataUser == undefined || dataProduct == undefined) return res.status(500).json({ error: "User or product not found" })
 
